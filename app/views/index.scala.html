@@ -1,0 +1,35 @@
+@()
+
+@main("Welcome to Play") {
+<h1>Welcome to the Flight Advisor!</h1>
+<h2>Endpoints</h2>
+
+<h3>GET</h3>
+<p><b>/home</b> returns home page.</p>
+
+<h3>POST</h3>
+<p><b>/user/login</b> login new user to the system.</p>
+<code>curl -X POST -H 'Content-Type: application/json' -d '{"name": "pera", "password": "pera1234"}'
+    localhost:9000/user/login
+</code>
+
+<h3>POST</h3>
+<p><b>/user/logout</b> logout logged user from the system. </p>
+<code>curl -X POST -H 'Content-Type: application/json' localhost:9000/user/logout
+</code>
+
+<h3>GET</h3>
+<p><b>/city/all</b> return list of all cities from the system.</p>
+<code>curl -X GET localhost:9000/city/all</code>
+
+<h3>POST</h3>
+<p><b>/city/add</b> add new city to the system. </p>
+<code>curl -X POST -H 'Content-Type: application/json' -d '{"name": "Lyion", "country": "France", "description": "0,5
+    milion people"}' localhost:9000/city/add
+</code>
+
+<h3>POST</h3>
+<p><b>/import</b> import all airport and route information for existing cities to the system. </p>
+<code>curl -X POST -H 'Content-Type: application/json' -d '{}' localhost:9000/import
+</code>
+}
