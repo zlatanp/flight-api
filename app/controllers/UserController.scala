@@ -46,36 +46,36 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
         if (json.isEmpty) {
           logger.error("Empty Json data.")
           BadRequest(jsonErrResponse("Expecting Json data"))
-        }
+        } else {
+          val name = (json.get \ "name").asOpt[String]
+          val password = (json.get \ "password").asOpt[String]
 
-        val name = (json.get \ "name").asOpt[String]
-        val password = (json.get \ "password").asOpt[String]
-
-        (name, password) match {
-          case (None, None) => {
-            logger.warn("Missing parameter [name] and [password]")
-            BadRequest(jsonErrResponse("Missing parameter [name] and [password]"))
-          }
-          case (None, Some(p)) => {
-            logger.warn("Missing parameter [name]")
-            BadRequest(jsonErrResponse("Missing parameter [name]"))
-          }
-          case (Some(n), None) => {
-            logger.warn("Missing parameter [password]")
-            BadRequest(jsonErrResponse("Missing parameter [password]"))
-          }
-          case (Some(n), Some(p)) => {
-            db.findUserByName(n) match {
-              case None => {
-                logger.info("No user found for name $n")
-                BadRequest(jsonErrResponse(s"No user found for name $n"))
-              }
-              case Some(u) => if (u.password != p) {
-                logger.warn("Bad password");
-                BadRequest(jsonErrResponse("Bad password"))
-              } else {
-                logger.info("Success login.")
-                Ok(Json.arr(jsonSuccessResponse("login"), Json.obj("user" -> Json.toJson(u)))).withSession(request.session + ("connected" -> s"$n") + ("usertype" -> u.typeOfUser.toString))
+          (name, password) match {
+            case (None, None) => {
+              logger.warn("Missing parameter [name] and [password]")
+              BadRequest(jsonErrResponse("Missing parameter [name] and [password]"))
+            }
+            case (None, Some(p)) => {
+              logger.warn("Missing parameter [name]")
+              BadRequest(jsonErrResponse("Missing parameter [name]"))
+            }
+            case (Some(n), None) => {
+              logger.warn("Missing parameter [password]")
+              BadRequest(jsonErrResponse("Missing parameter [password]"))
+            }
+            case (Some(n), Some(p)) => {
+              db.findUserByName(n) match {
+                case None => {
+                  logger.info(s"No user found for name $n")
+                  BadRequest(jsonErrResponse(s"No user found for name $n"))
+                }
+                case Some(u) => if (u.password != p) {
+                  logger.warn("Bad password")
+                  BadRequest(jsonErrResponse("Bad password"))
+                } else {
+                  logger.info("Success login.")
+                  Ok(Json.arr(jsonSuccessResponse("login"), Json.obj("user" -> Json.toJson(u)))).withSession(request.session + ("connected" -> s"$n") + ("usertype" -> u.typeOfUser.toString))
+                }
               }
             }
           }

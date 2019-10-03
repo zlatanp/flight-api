@@ -2,7 +2,8 @@ package api
 
 
 import javax.inject.Singleton
-import models._
+import models.{City, _}
+import org.joda.time.DateTime
 
 import scala.collection.mutable.ListBuffer
 
@@ -18,7 +19,12 @@ class DataBase {
   users += User(2, "B", "BB", "bbb", "xxx", "x1x1x1", Regular)
   users += User(3, "C", "CC", "ccc", "xxx", "x1x1x1", Regular)
 
-  cities += City("Belgrade", "Serbia", "1,3 milion people", new ListBuffer[Comment]())
+  var commentaries = new ListBuffer[Comment]()
+  commentaries += Comment("aaa", "bas je lep ovaj", DateTime.now().plusDays(2))
+  commentaries += Comment("bbb", "eee", DateTime.now().minusDays(2))
+  commentaries += Comment("ccc", "neki komentar", DateTime.now())
+
+  cities += City("Belgrade", "Serbia", "1,3 milion people", commentaries)
   cities += City("Frankfurt", "Germany", "0,7 milion people", new ListBuffer[Comment]())
   cities += City("Dubai", "United Arab Emirates", "3,1 milion people", new ListBuffer[Comment]())
   cities += City("Los Angeles", "California", "4 milion people", new ListBuffer[Comment]())

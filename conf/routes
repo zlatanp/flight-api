@@ -18,6 +18,8 @@ POST    /user/logout                controllers.UserController.logout
 + nocsrf
 GET    /city/all                    controllers.CityController.all
 + nocsrf
+GET    /city/one                    controllers.CityController.getCity
++ nocsrf
 POST    /city/add                   controllers.CityController.add
 + nocsrf
 POST    /city/comment               controllers.CityController.comment

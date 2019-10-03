@@ -45,16 +45,7 @@ class AirportController @Inject()(cc: ControllerComponents) extends AbstractCont
             }
           }
           logger.info("Success import routes");
-
-          println()
-          db.getAirports().map(println(_))
-          println(db.getAirports().size)
-          //db.getRoutes().map(println(_))
-          println(db.getRoutes().size)
-          println()
-          db.getAllCities().map(println(_))
-
-          logger.info("Success import");
+          
           Ok(jsonSuccessResponse("import"))
         } else {
           logger.warn("User have no permission to access this service");
