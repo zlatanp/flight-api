@@ -22,7 +22,8 @@ object JsonHelper {
     def writes(comment: Comment) = Json.obj(
       "user" -> comment.user,
       "content" -> comment.content,
-      "timestamp" -> comment.timestamp.toString
+      "timestamp" -> comment.timestamp.toString,
+      "cityName" -> comment.cityName
     )
   }
 
@@ -31,8 +32,7 @@ object JsonHelper {
     def writes(city: City) = Json.obj(
       "name" -> city.name,
       "country" -> city.country,
-      "description" -> city.description,
-      "comments" -> city.comments
+      "description" -> city.description
     )
   }
 
