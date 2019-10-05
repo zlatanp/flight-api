@@ -1,12 +1,11 @@
 package controllers
 
-import api.DataBase
-import api.JsonHelper._
+import api.JsonHelper.{jsonErrResponse, jsonSuccessResponse}
 import javax.inject._
-import models.User
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
+import services.UserService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -16,42 +15,15 @@ import scala.concurrent.Future
  * application's home page.
  */
 @Singleton
-class UserController @Inject()(cc: ControllerComponents, db: DataBase) extends AbstractController(cc) {
+class UserController @Inject()(cc: ControllerComponents, service: UserService) extends AbstractController(cc) {
 
   val logger: Logger = Logger(this.getClass())
 
   def index() = Action.async({ request: Request[AnyContent] =>
-
-    val user = request.session.get("connected")
-    val usertype = request.session.get("usertype")
-
-    (user, usertype) match {
-      case (Some(u), Some(t)) => {
-        db.findUserByName(u).map({
-          case Some(userExist) => {
-            userExist match {
-              case (id, firstName, lastName, name, password, salt, typeOfUser) => {
-                val loggedInUser = User(id, firstName, lastName, name, password, salt, typeOfUser)
-                logger.info(s"Logged in user: '$u'")
-                Ok(Json.obj("user" -> Json.toJson(loggedInUser)))
-              }
-              case _ => {
-                logger.warn("Not connected user trying to open index page.")
-                Unauthorized(jsonErrResponse("Oops, you are not connected"))
-              }
-            }
-          }
-          case None => {
-            logger.warn("Not connected user trying to open index page.")
-            Unauthorized(jsonErrResponse("Oops, you are not connected"))
-          }
-        })
-      }
-      case (_, _) => {
-        logger.warn("Not connected user trying to open index page.")
-        Future(Unauthorized(jsonErrResponse("Oops, you are not connected")))
-      }
-    }
+    service.index(request.session.get("connected"), request.session.get("usertype")).map(jsResponse => jsResponse.keys.contains("success") match {
+      case true => Ok(jsResponse)
+      case false => BadRequest(jsResponse)
+    })
   })
 
 
@@ -63,50 +35,14 @@ class UserController @Inject()(cc: ControllerComponents, db: DataBase) extends A
         Future(Ok(Json.arr(jsonErrResponse("Already logged in"), Json.obj("user" -> Json.toJson(name)))))
       }
       .getOrElse {
-        val json = request.body.asJson
-        if (json.isEmpty) {
-          logger.error("Empty Json data.")
-          Future(BadRequest(jsonErrResponse("Expecting Json data")))
-        } else {
-          val name = (json.get \ "name").asOpt[String]
-          val password = (json.get \ "password").asOpt[String]
-
-          (name, password) match {
-            case (None, None) => {
-              logger.warn("Missing parameter [name] and [password]")
-              Future(BadRequest(jsonErrResponse("Missing parameter [name] and [password]")))
-            }
-            case (None, Some(p)) => {
-              logger.warn("Missing parameter [name]")
-              Future(BadRequest(jsonErrResponse("Missing parameter [name]")))
-            }
-            case (Some(n), None) => {
-              logger.warn("Missing parameter [password]")
-              Future(BadRequest(jsonErrResponse("Missing parameter [password]")))
-            }
-            case (Some(n), Some(p)) => {
-              db.logIn(n, p).map({
-                case Some(userExist) => {
-                  userExist match {
-                    case (id, firstName, lastName, name, password, salt, typeOfUser) => {
-                      val loggedInUser = User(id, firstName, lastName, name, password, salt, typeOfUser)
-                      logger.info("Success login.")
-                      Ok(Json.arr(jsonSuccessResponse("login"), Json.obj("user" -> Json.toJson(loggedInUser)))).withSession(request.session + ("connected" -> s"$n") + ("usertype" -> loggedInUser.typeOfUser.toString))
-                    }
-                    case _ => {
-                      logger.warn("Not connected user trying to open index page.")
-                      Unauthorized(jsonErrResponse("Oops, you are not connected"))
-                    }
-                  }
-                }
-                case None => {
-                  logger.info(s"No user found for name $n or bad password")
-                  BadRequest(jsonErrResponse(s"No user found for name $n or bad password"))
-                }
-              })
-            }
+        service.login(request.body.asJson).map(jsResponse => jsResponse.keys.contains("success") match {
+          case true => {
+            val connected = (jsResponse \ "user" \ "name").get.toString.replaceAll("\"", "")
+            val userType = (jsResponse \ "user" \ "typeOfUser").get.toString.replaceAll("\"", "")
+            Ok(jsResponse).withSession(request.session + ("connected" -> connected) + ("usertype" -> userType))
           }
-        }
+          case false => BadRequest(jsResponse)
+        })
       }
   }
 
