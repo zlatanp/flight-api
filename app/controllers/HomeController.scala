@@ -23,9 +23,6 @@ class HomeController @Inject()(cc: ControllerComponents, db: DataBase) extends A
    * a path of `/`.
    */
   def index() = Action.async({ implicit request: Request[AnyContent] =>
-//    db.getAllAirports.foreach(println(_))
-//    x.onComplete(println(_))
-//    y.onComplete(println(_))
     Future(Ok(views.html.index()))
 
   })

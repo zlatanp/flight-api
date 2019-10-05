@@ -1,6 +1,6 @@
 package api
 
-import models.{City, Comment, User}
+import models.{City, CityJson, Comment, User}
 
 object JsonHelper {
 
@@ -33,6 +33,15 @@ object JsonHelper {
       "name" -> city.name,
       "country" -> city.country,
       "description" -> city.description
+    )
+  }
+
+  implicit val cityJsonWriter = new Writes[CityJson] {
+    def writes(city: CityJson) = Json.obj(
+      "name" -> city.name,
+      "country" -> city.country,
+      "description" -> city.description,
+      "comments" -> city.comments
     )
   }
 
