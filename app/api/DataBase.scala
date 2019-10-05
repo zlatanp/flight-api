@@ -148,9 +148,9 @@ class DataBase {
   cities += ("Dubai", "United Arab Emirates", "3,1 milion people"),
   cities += ("Los Angeles", "California", "4 milion people"),
 
-  comments += ("aaa", "Nice City!", DateTime.now().minusDays(2), "Belgrade"),
-  comments += ("bbb", "I like It!", DateTime.now().plusDays(2), "Belgrade"),
-  comments += ("ccc", "Capital city of Serbia.", DateTime.now(), "Belgrade")
+  comments += ("aaa", "Nice City!", new DateTime("2019-10-07T15:06:15.502+02:00"), "Belgrade"),
+  comments += ("bbb", "I like It!", new DateTime("2019-10-05T15:06:15.502+02:00"), "Belgrade"),
+  comments += ("ccc", "Capital city of Serbia.", new DateTime("2019-10-09T15:06:15.502+02:00"), "Belgrade")
   )
   val setupFuture = db.run(setup)
 
