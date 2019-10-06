@@ -207,6 +207,10 @@ class DataBase {
     db.run(comments.filter(_.cityName === cityName).filter(_.user === user).delete).map(_ => ())
   }
 
+  def findAirportByCityName(cityName: String) = {
+    db.run((for (comment <- comments if comment.cityName === cityName) yield comment).result)
+  }
+
   def getCitiesWithComments(cities: Seq[(String, String, String)], comments: Seq[(String, String, DateTime, String)], numberOfComments: Option[Int]): List[CityJson] = {
     implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 

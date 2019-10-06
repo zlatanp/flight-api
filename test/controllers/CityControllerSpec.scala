@@ -45,7 +45,7 @@ class CityControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
 
       status(home) mustBe OK
       contentType(home) mustBe Some("application/json")
-      contentAsString(home) must include ("""{"success":"delete","cities":[{"name":"Belgrade","country":"Serbia","description":"1,3 milion people","comments":[{"user":"aaa","content":"Nice City!","timestamp":"2019-10-07T15:06:15.502+02:00","cityName":"Belgrade"},{"user":"bbb","content":"I like It!","timestamp":"2019-10-05T15:06:15.502+02:00","cityName":"Belgrade"},{"user":"ccc","content":"Capital city of Serbia.","timestamp":"2019-10-09T15:06:15.502+02:00","cityName":"Belgrade"}]}]}""")
+      contentAsString(home) must include ("""{"success":"get","cities":[{"name":"Belgrade","country":"Serbia","description":"1,3 milion people","comments":[{"user":"aaa","content":"Nice City!","timestamp":"2019-10-07T15:06:15.502+02:00","cityName":"Belgrade"},{"user":"bbb","content":"I like It!","timestamp":"2019-10-05T15:06:15.502+02:00","cityName":"Belgrade"},{"user":"ccc","content":"Capital city of Serbia.","timestamp":"2019-10-09T15:06:15.502+02:00","cityName":"Belgrade"}]}]}""")
     }
 
     "return list of one city with limited number of comments" in {
@@ -54,7 +54,7 @@ class CityControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
 
       status(home) mustBe OK
       contentType(home) mustBe Some("application/json")
-      contentAsString(home) must include ("""{"success":"delete","cities":[{"name":"Belgrade","country":"Serbia","description":"1,3 milion people","comments":[{"user":"ccc","content":"Capital city of Serbia.","timestamp":"2019-10-09T15:06:15.502+02:00","cityName":"Belgrade"}]}]}""")
+      contentAsString(home) must include ("""{"success":"get","cities":[{"name":"Belgrade","country":"Serbia","description":"1,3 milion people","comments":[{"user":"ccc","content":"Capital city of Serbia.","timestamp":"2019-10-09T15:06:15.502+02:00","cityName":"Belgrade"}]}]}""")
     }
 
     "admin create new city " in {

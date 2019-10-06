@@ -3,6 +3,7 @@ package controllers
 import api.DataBase
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice._
+import play.api.libs.json.Json
 import play.api.test._
 import play.api.test.Helpers._
 import services.AirportService
@@ -41,6 +42,15 @@ class AirportControllerSpec extends PlaySpec with GuiceOneAppPerTest with Inject
       status(adminUserRequest) mustBe OK
       contentType(adminUserRequest) mustBe Some("application/json")
       contentAsString(adminUserRequest) must be("{\"success\":\"import\"}")
+    }
+
+    "return cheapest flight" in {
+      val controller = new AirportController(stubControllerComponents(), service)
+      val adminUserRequest = controller.getFlights().apply(FakeRequest(GET, "/flights").withJsonBody(Json.parse("""{ "from": "Belgrade","to": "Dubai"}""")).withSession("connected" -> "aaa", "usertype" -> "Admin"))
+
+      status(adminUserRequest) mustBe OK
+      contentType(adminUserRequest) mustBe Some("application/json")
+      contentAsString(adminUserRequest) must include("\"flight\":{\"price\":25.85,\"distance\":3816.46,\"routes\":[{\"airline\":\"FZ\",\"airlineId\":\"14485\",\"sourceAirport\":\"BEG\",\"sourceAirportId\":\"1739\",\"destinationAirpot\":\"DXB\",\"destinationAirportId\":\"2188\",\"codeshare\":\"\",\"stops\":0,\"equipment\":\"73H\",\"price\":25.85}]}")
     }
   }
 }

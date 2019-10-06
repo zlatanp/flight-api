@@ -32,7 +32,7 @@ class UserController @Inject()(cc: ControllerComponents, service: UserService) e
       .get("connected")
       .map { name =>
         logger.info(s"Already logged in user: '$name'")
-        Future(Ok(Json.arr(jsonErrResponse("Already logged in"), Json.obj("user" -> Json.toJson(name)))))
+        Future(Ok(jsonErrResponse("Already logged in") ++ Json.obj("user" -> Json.toJson(name))))
       }
       .getOrElse {
         service.login(request.body.asJson).map(jsResponse => jsResponse.keys.contains("success") match {
@@ -51,7 +51,7 @@ class UserController @Inject()(cc: ControllerComponents, service: UserService) e
       .get("connected")
       .map { name =>
         logger.info("Log out")
-        Ok(Json.arr(jsonSuccessResponse("logout"), Json.obj("user" -> Json.toJson(name)))).withSession(request.session - "connected" - "usertype")
+        Ok(jsonSuccessResponse("logout") ++ Json.obj("user" -> Json.toJson(name))).withSession(request.session - "connected" - "usertype")
       }
       .getOrElse {
         logger.info("You are not signed in!")

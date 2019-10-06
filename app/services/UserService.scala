@@ -10,11 +10,11 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class UserService @Inject()(db: DataBase){
+class UserService @Inject()(db: DataBase) {
 
   val logger: Logger = Logger(this.getClass())
 
-  def index(user: Option[String], usertype: Option[String]): Future[JsObject] ={
+  def index(user: Option[String], usertype: Option[String]): Future[JsObject] = {
     (user, usertype) match {
       case (Some(u), Some(t)) => {
         db.findUserByName(u).map({
@@ -44,7 +44,7 @@ class UserService @Inject()(db: DataBase){
     }
   }
 
-  def login(json: Option[JsValue]) : Future[JsObject] ={
+  def login(json: Option[JsValue]): Future[JsObject] = {
     if (json.isEmpty) {
       logger.error("Empty Json data.")
       Future(jsonErrResponse("Expecting Json data"))

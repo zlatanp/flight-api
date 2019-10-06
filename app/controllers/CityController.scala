@@ -1,12 +1,8 @@
 package controllers
 
-import api.DataBase
-import api.JsonHelper.{jsonErrResponse, jsonSuccessResponse, _}
+import api.JsonHelper.jsonErrResponse
 import javax.inject.{Inject, Singleton}
-import models.{City, Comment}
-import org.joda.time.DateTime
 import play.api.Logger
-import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
 import services.CityService
 
@@ -87,11 +83,11 @@ class CityController @Inject()(cc: ControllerComponents, service: CityService) e
       request.session
         .get("connected")
         .map { userName =>
-            request.body.asJson
-            service.getCity(userName, request.body.asJson).map(jsResponse => jsResponse.keys.contains("success") match {
-              case true => Ok(jsResponse)
-              case false => BadRequest(jsResponse)
-            })
+          request.body.asJson
+          service.getCity(userName, request.body.asJson).map(jsResponse => jsResponse.keys.contains("success") match {
+            case true => Ok(jsResponse)
+            case false => BadRequest(jsResponse)
+          })
 
         }
         .getOrElse {

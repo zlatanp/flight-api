@@ -46,7 +46,7 @@ class UserControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
 
       status(loggedInUser) mustBe OK
       contentType(loggedInUser) mustBe Some("application/json")
-      contentAsString(loggedInUser) must be("[{\"success\":\"logout\"},{\"user\":\"aaa\"}]")
+      contentAsString(loggedInUser) must include("""{"success":"logout","user":"aaa"}""")
 
       status(notLoggedInUser) mustBe BAD_REQUEST
       contentType(notLoggedInUser) mustBe Some("application/json")

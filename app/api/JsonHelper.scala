@@ -1,6 +1,6 @@
 package api
 
-import models.{City, CityJson, Comment, User}
+import models.{City, CityJson, Comment, Flight, Route, User}
 
 object JsonHelper {
 
@@ -42,6 +42,29 @@ object JsonHelper {
       "country" -> city.country,
       "description" -> city.description,
       "comments" -> city.comments
+    )
+  }
+
+  implicit val routesWriter = new Writes[Route] {
+    def writes(route: Route) = Json.obj(
+      "airline" -> route.airline,
+      "airlineId" -> route.airlineId,
+      "sourceAirport" -> route.sourceAirport,
+      "sourceAirportId" -> route.sourceAirportId,
+      "destinationAirpot" -> route.destinationAirpot,
+      "destinationAirportId" -> route.destinationAirportId,
+      "codeshare" -> route.codeshare,
+      "stops" -> route.stops,
+      "equipment" -> route.equipment,
+      "price" -> route.price
+    )
+  }
+
+  implicit val flightWriter = new Writes[Flight] {
+    def writes(flight: Flight) = Json.obj(
+      "price" -> flight.price,
+      "distance" -> flight.distance,
+      "routes" -> flight.routes
     )
   }
 

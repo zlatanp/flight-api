@@ -56,4 +56,9 @@
 <p><b>/import</b> import all airport and route information for existing cities to the system. (Only admin can access to this endpoint)</p>
 <code>curl -X POST -H 'Content-Type: application/json' -d '{}' localhost:9000/import
 </code>
+
+<h3>GET</h3>
+<p><b>/flights</b> get best flight between two cities</p>
+<code>curl -X GET -H 'Content-Type: application/json' -d '{"from": "Belgrade", "to": "Dubai"}' localhost:9000/flights
+</code>
 }

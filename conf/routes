@@ -27,3 +27,5 @@ POST    /city/comment               controllers.CityController.comment
 DELETE    /city/deleteComment       controllers.CityController.delete
 + nocsrf
 POST    /import                     controllers.AirportController.importAirport
++ nocsrf
+GET    /flights                     controllers.AirportController.getFlights
