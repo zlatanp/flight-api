@@ -1,5 +1,12 @@
 package models
 
-import scala.collection.mutable.ListBuffer
+import play.api.libs.json.Json
 
-case class Flight(price: Double, distance: Double, routes: ListBuffer[Route])
+import scala.collection.mutable
+
+case class Flight(price: Double, distance: Double, routes: mutable.MutableList[Route])
+
+object Flight {
+  implicit val cityWrites = Json.writes[Route]
+  implicit val flightWrites = Json.writes[Flight]
+}

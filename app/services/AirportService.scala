@@ -1,14 +1,14 @@
 package services
 
-import api.DataBase
-import api.JsonHelper.{jsonErrResponse, jsonSuccessResponse, _}
+import helpers.JsonHelper.{jsonErrResponse, jsonSuccessResponse, _}
 import com.typesafe.config.ConfigFactory
+import database.DataBase
 import javax.inject.Inject
 import models.{Airport, City, Flight, Route}
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.MutableList
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.Source
@@ -20,10 +20,10 @@ class AirportService @Inject()(db: DataBase) {
   val airportsPath = ConfigFactory.load().getString("data.airport")
   val routesPath = ConfigFactory.load().getString("data.route")
 
-  var allAirportsCache: ListBuffer[Airport] = new ListBuffer[Airport]()
-  var allRoutesCache: ListBuffer[Route] = new ListBuffer[Route]()
+  var allAirportsCache: MutableList[Airport] = new MutableList[Airport]()
+  var allRoutesCache: MutableList[Route] = new MutableList[Route]()
 
-  var allFlightsList: ListBuffer[Flight] = new ListBuffer[Flight]()
+  var allFlightsList: MutableList[Flight] = new MutableList[Flight]()
 
   def importAirport(usertype: String) = {
     if (usertype.equalsIgnoreCase("admin")) {
@@ -129,7 +129,7 @@ class AirportService @Inject()(db: DataBase) {
   def findFlightsBetweenAirports(sourceAirport: Airport, destinationAirport: Airport): Unit = {
     val routes = allRoutesCache.filter(route => route.sourceAirportId == sourceAirport.airportId)
     routes.foreach(route => {
-      getFlightsForRoute(route: Route, Flight(0, 0, new ListBuffer[Route]()), destinationAirport)
+      getFlightsForRoute(route: Route, Flight(0, 0, new MutableList[Route]()), destinationAirport)
     })
   }
 
@@ -154,14 +154,14 @@ class AirportService @Inject()(db: DataBase) {
   }
 
   def createFlight(previousFlights: Flight, route: Route): Flight = {
-    val newRoutes: ListBuffer[Route] = previousFlights.routes += route
+    val newRoutes: MutableList[Route] = previousFlights.routes += route
     val price: Double = newRoutes.map(route => route.price).sum
     val distance: Double = previousFlights.distance + flightDistance(newRoutes)
 
     Flight(round(price), round(distance), newRoutes)
   }
 
-  def flightDistance(routes: ListBuffer[Route]): Double = {
+  def flightDistance(routes: MutableList[Route]): Double = {
     routes.map(route => getAirportsDistance(allAirportsCache.filter(a => a.airportId == route.sourceAirportId).head, allAirportsCache.filter(a => a.airportId == route.destinationAirportId).head)).sum
   }
 
@@ -193,7 +193,7 @@ class AirportService @Inject()(db: DataBase) {
     Math.round(number * 100.0) / 100.0
   }
 
-  def getCheapest(allFlightsList: ListBuffer[Flight]): Flight = {
+  def getCheapest(allFlightsList: MutableList[Flight]): Flight = {
     allFlightsList.sortBy(_.price).head
   }
 }

@@ -1,6 +1,6 @@
 package controllers
 
-import api.DataBase
+import database.DataBase
 import javax.inject._
 import play.api.mvc._
 

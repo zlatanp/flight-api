@@ -1,6 +1,6 @@
 package controllers
 
-import api.JsonHelper.jsonErrResponse
+import helpers.JsonHelper.jsonErrResponse
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}

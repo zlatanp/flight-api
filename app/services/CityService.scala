@@ -1,7 +1,7 @@
 package services
 
-import api.DataBase
-import api.JsonHelper.{jsonErrResponse, jsonSuccessResponse, _}
+import helpers.JsonHelper.{jsonErrResponse, jsonSuccessResponse, _}
+import database.DataBase
 import javax.inject.Inject
 import models.{City, Comment}
 import org.joda.time.DateTime

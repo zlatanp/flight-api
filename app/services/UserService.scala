@@ -1,9 +1,10 @@
 package services
 
-import api.DataBase
-import api.JsonHelper.{jsonErrResponse, _}
+import helpers.JsonHelper.{jsonErrResponse, _}
+import database.DataBase
 import javax.inject.Inject
-import models.User
+import models.UserType.{Admin, Regular}
+import models.{User, UserType}
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsValue, Json}
 
@@ -21,7 +22,10 @@ class UserService @Inject()(db: DataBase) {
           case Some(userExist) => {
             userExist match {
               case (id, firstName, lastName, name, password, salt, typeOfUser) => {
-                val loggedInUser = User(id, firstName, lastName, name, password, salt, typeOfUser)
+                val loggedInUser = typeOfUser match {
+                  case Admin => User(id, firstName, lastName, name, password, salt, Admin)
+                  case Regular => User(id, firstName, lastName, name, password, salt, Regular)
+                }
                 logger.info(s"Logged in user: '$u'")
                 Json.obj("user" -> Json.toJson(loggedInUser))
               }
@@ -70,7 +74,10 @@ class UserService @Inject()(db: DataBase) {
             case Some(userExist) => {
               userExist match {
                 case (id, firstName, lastName, name, password, salt, typeOfUser) => {
-                  val loggedInUser = User(id, firstName, lastName, name, password, salt, typeOfUser)
+                  val loggedInUser = typeOfUser match {
+                    case Admin => User(id, firstName, lastName, name, password, salt, Admin)
+                    case Regular => User(id, firstName, lastName, name, password, salt, Regular)
+                  }
                   logger.info("Success login.")
                   jsonSuccessResponse("login") ++ Json.obj("user" -> Json.toJson(loggedInUser))
                 }

@@ -1,6 +1,6 @@
 package controllers
 
-import api.JsonHelper.{jsonErrResponse, jsonSuccessResponse}
+import helpers.JsonHelper.{jsonErrResponse, jsonSuccessResponse}
 import javax.inject._
 import play.api.Logger
 import play.api.libs.json.Json

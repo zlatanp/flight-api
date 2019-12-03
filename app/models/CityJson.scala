@@ -1,11 +1,10 @@
 package models
 
-import org.joda.time.DateTime
-import play.api.libs.json._
+import play.api.libs.json.{Json, Writes}
 
-case class Comment(user: String, content: String, timestamp: DateTime, cityName: String)
+case class CityJson(name: String, country: String, description: String, comments: List[Comment])
 
-object Comment {
+object CityJson {
   implicit val commentWriter = new Writes[Comment] {
     def writes(comment: Comment) = Json.obj(
       "user" -> comment.user,
@@ -14,4 +13,5 @@ object Comment {
       "cityName" -> comment.cityName
     )
   }
+  implicit val cityJsonWrites = Json.writes[CityJson]
 }
