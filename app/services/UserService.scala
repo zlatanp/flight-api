@@ -1,10 +1,10 @@
 package services
 
-import helpers.JsonHelper.{jsonErrResponse, _}
 import database.DataBase
+import helpers.JsonHelper.{jsonErrResponse, _}
 import javax.inject.Inject
+import models.User
 import models.UserType.{Admin, Regular}
-import models.{User, UserType}
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsValue, Json}
 

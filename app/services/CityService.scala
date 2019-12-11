@@ -1,7 +1,7 @@
 package services
 
-import helpers.JsonHelper.{jsonErrResponse, jsonSuccessResponse, _}
 import database.DataBase
+import helpers.JsonHelper.{jsonErrResponse, jsonSuccessResponse}
 import javax.inject.Inject
 import models.{City, Comment}
 import org.joda.time.DateTime
@@ -11,11 +11,11 @@ import play.api.libs.json.{JsValue, Json}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CityService @Inject()(db: DataBase){
+class CityService @Inject()(db: DataBase) {
 
   val logger: Logger = Logger(this.getClass())
 
-  def all(json: Option[JsValue]) ={
+  def all(json: Option[JsValue]) = {
     if (json.isEmpty) {
       logger.error("Empty Json data.")
       Future(jsonErrResponse("Expecting Json data"))
@@ -41,7 +41,7 @@ class CityService @Inject()(db: DataBase){
     }
   }
 
-  def add (usertype: String, json: Option[JsValue]) = {
+  def add(usertype: String, json: Option[JsValue]) = {
     if (usertype.equalsIgnoreCase("admin")) {
 
       if (json.isEmpty) {
@@ -54,7 +54,7 @@ class CityService @Inject()(db: DataBase){
 
         (name, country, description) match {
           case (Some(name), Some(country), Some(description)) => {
-            val newCity = City(name, country, description)
+            val newCity = City(name, country, description, Seq(Comment("", "", DateTime.now, "")))
             db.addCity(newCity)
             logger.info("Add new city to database")
             Future(jsonSuccessResponse("create") ++ Json.obj("city" -> Json.toJson(newCity)))
@@ -71,7 +71,7 @@ class CityService @Inject()(db: DataBase){
     }
   }
 
-  def comment(userName: String, json: Option[JsValue]) ={
+  def comment(userName: String, json: Option[JsValue]) = {
     if (json.isEmpty) {
       logger.error("Empty Json data.")
       Future(jsonErrResponse("Expecting Json data"))
@@ -102,7 +102,7 @@ class CityService @Inject()(db: DataBase){
     }
   }
 
-  def delete(userName: String, json: Option[JsValue]) ={
+  def delete(userName: String, json: Option[JsValue]) = {
     if (json.isEmpty) {
       logger.error("Empty Json data.")
       Future(jsonErrResponse("Expecting Json data"))
@@ -113,7 +113,7 @@ class CityService @Inject()(db: DataBase){
           db.findCityByName(cityName).map({
             case Some(cityExist) => {
               cityExist match {
-                case (name, country, description) => {
+                case (name, country, description, comment) => {
                   db.deleteComment(userName, cityName)
                   logger.warn(s"Comment from user $userName deleted for city: $cityName")
                   jsonSuccessResponse("delete")
@@ -134,7 +134,7 @@ class CityService @Inject()(db: DataBase){
     }
   }
 
-  def getCity(userName: String, json: Option[JsValue]) ={
+  def getCity(userName: String, json: Option[JsValue]) = {
     if (json.isEmpty) {
       logger.error("Empty Json data.")
       Future(jsonErrResponse("Expecting Json data"))
@@ -147,7 +147,7 @@ class CityService @Inject()(db: DataBase){
             for {
               oneCity <- db.findCityByName(city)
               comments <- db.getAllComments()
-            } yield db.getCitiesWithComments(Seq(oneCity.getOrElse(s"No city found for name '$city'", "", "")), comments, numberOfComments)
+            } yield db.getCitiesWithComments(Seq(oneCity.getOrElse(s"No city found for name '$city'", "", "", Seq(Comment("", "", DateTime.now, "")))), comments, numberOfComments)
           result.map(responseCity => {
             logger.info(s"Return one city with name $city")
             jsonSuccessResponse("get") ++ Json.obj("cities" -> Json.toJson(responseCity))

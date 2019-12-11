@@ -1,6 +1,6 @@
 package database
 
-import database.templates.{AirportTemplate, CityTemplate, CommentTemplate, RouteTemplate, UserTemplate}
+import database.templates._
 import javax.inject.Singleton
 import models.UserType.{Admin, Regular}
 import models._
@@ -20,20 +20,20 @@ class DataBase {
   var airports = TableQuery[AirportTemplate]
 
   val setup = DBIO.seq(
-  (users.schema ++ cities.schema ++ routes.schema ++ comments.schema ++ airports.schema).create,
+    (users.schema ++ cities.schema ++ routes.schema ++ comments.schema ++ airports.schema).create,
 
-  users += (1, "A", "AA", "aaa", "xxx", "x1x1x1", Admin),
-  users += (2, "B", "BB", "bbb", "xxx", "x1x1x1", Regular),
-  users += (3, "C", "CC", "ccc", "xxx", "x1x1x1", Regular),
+    users += (1, "A", "AA", "aaa", "xxx", "x1x1x1", Admin),
+    users += (2, "B", "BB", "bbb", "xxx", "x1x1x1", Regular),
+    users += (3, "C", "CC", "ccc", "xxx", "x1x1x1", Regular),
 
-  cities += ("Belgrade", "Serbia", "1,3 milion people"),
-  cities += ("Frankfurt", "Germany", "0,7 milion people"),
-  cities += ("Dubai", "United Arab Emirates", "3,1 milion people"),
-  cities += ("Los Angeles", "California", "4 milion people"),
+    cities += ("Belgrade", "Serbia", "1,3 milion people", Seq(Comment("", "", DateTime.now, ""))),
+    cities += ("Frankfurt", "Germany", "0,7 milion people", Seq(Comment("", "", DateTime.now, ""))),
+    cities += ("Dubai", "United Arab Emirates", "3,1 milion people", Seq(Comment("", "", DateTime.now, ""))),
+    cities += ("Los Angeles", "California", "4 milion people", Seq(Comment("", "", DateTime.now, ""))),
 
-  comments += ("aaa", "Nice City!", new DateTime("2019-10-07T15:06:15.502+02:00"), "Belgrade"),
-  comments += ("bbb", "I like It!", new DateTime("2019-10-05T15:06:15.502+02:00"), "Belgrade"),
-  comments += ("ccc", "Capital city of Serbia.", new DateTime("2019-10-09T15:06:15.502+02:00"), "Belgrade")
+    comments += ("aaa", "Nice City!", new DateTime("2019-10-07T15:06:15.502+02:00"), "Belgrade"),
+    comments += ("bbb", "I like It!", new DateTime("2019-10-05T15:06:15.502+02:00"), "Belgrade"),
+    comments += ("ccc", "Capital city of Serbia.", new DateTime("2019-10-09T15:06:15.502+02:00"), "Belgrade")
   )
 
   val setupFuture = db.run(setup)
@@ -67,7 +67,7 @@ class DataBase {
   }
 
   def addCity(city: City): Unit = {
-    db.run(cities += (city.name, city.country, city.description)).map(_ => ())
+    db.run(cities += (city.name, city.country, city.description, city.comments)).map(_ => ())
   }
 
   def findCityByName(name: String) = {
@@ -94,15 +94,15 @@ class DataBase {
     db.run((for (comment <- comments if comment.cityName === cityName) yield comment).result)
   }
 
-  def getCitiesWithComments(cities: Seq[(String, String, String)], comments: Seq[(String, String, DateTime, String)], numberOfComments: Option[Int]): List[CityJson] = {
+  def getCitiesWithComments(cities: Seq[(String, String, String, Seq[Comment])], comments: Seq[(String, String, DateTime, String)], numberOfComments: Option[Int]): List[City] = {
     implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
-    val realCities: Seq[City] = cities.map(c => City(c._1, c._2, c._3))
+    val realCities: Seq[City] = cities.map(c => City(c._1, c._2, c._3, c._4))
     val realComments: Seq[Comment] = comments.map(c => Comment(c._1, c._2, c._3, c._4))
 
     numberOfComments match {
-      case Some(number) => realCities.toList.map(city => CityJson(city.name, city.country, city.description, realComments.toList.filter(c => c.cityName == city.name).sortBy(_.timestamp).take(number)))
-      case None => realCities.toList.map(city => CityJson(city.name, city.country, city.description, realComments.toList.filter(c => c.cityName == city.name)))
+      case Some(number) => realCities.toList.map(city => City(city.name, city.country, city.description, realComments.toList.filter(c => c.cityName == city.name).sortBy(_.timestamp).take(number)))
+      case None => realCities.toList.map(city => City(city.name, city.country, city.description, realComments.toList.filter(c => c.cityName == city.name)))
     }
   }
 }

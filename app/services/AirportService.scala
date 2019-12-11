@@ -1,8 +1,8 @@
 package services
 
-import helpers.JsonHelper.{jsonErrResponse, jsonSuccessResponse, _}
 import com.typesafe.config.ConfigFactory
 import database.DataBase
+import helpers.JsonHelper.{jsonErrResponse, jsonSuccessResponse}
 import javax.inject.Inject
 import models.{Airport, City, Flight, Route}
 import play.api.Logger
@@ -37,7 +37,7 @@ class AirportService @Inject()(db: DataBase) {
           case Vector(airportId, name, city, country, iata, icao, latitude, longitude, altitude, timezone, dst, tz, typeOfAirport, source) => {
             val airport = Airport(airportId, name, city, country, iata, icao, BigDecimal(latitude), BigDecimal(longitude), altitude.toDouble, if (timezone == "\\N") BigDecimal(0) else BigDecimal(timezone), dst, tz, typeOfAirport, source)
             allCities.map(_.foreach {
-              case (name, country, description) => {
+              case (name, country, description, comments) => {
                 if (name == city) {
                   db.addAirport(airport)
                   allAirportsCache += airport
@@ -98,10 +98,10 @@ class AirportService @Inject()(db: DataBase) {
 
           cities.map({
             case (Some(sCity), Some(dCity)) => {
-              findAllFlights(City(sCity._1, sCity._2, sCity._3), City(dCity._1, dCity._2, dCity._3))
-              if(allFlightsList.isEmpty){
+              findAllFlights(City(sCity._1, sCity._2, sCity._3, sCity._4), City(dCity._1, dCity._2, dCity._3, sCity._4))
+              if (allFlightsList.isEmpty) {
                 jsonErrResponse("No airports imported")
-              }else{
+              } else {
                 jsonSuccessResponse("flights") ++ Json.obj("flight" -> Json.toJson(getCheapest(allFlightsList)))
               }
             }
