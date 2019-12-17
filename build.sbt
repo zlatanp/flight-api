@@ -17,9 +17,3 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick-codegen" % "3.2.1",
   "com.typesafe.play" % "play-json-joda_2.12" % "2.6.0",
   "com.h2database" % "h2" % "1.4.192")
-
-// Adds additional packages into Twirl
-//TwirlKeys.templateImports += "com.example.controllers._"
-
-// Adds additional packages into conf/routes
-// play.sbt.routes.RoutesKeys.routesImport += "com.example.binders._"

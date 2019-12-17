@@ -1,10 +1,11 @@
 package controllers
 
 import helpers.AuthorizationAction
-import helpers.JsonHelper.{jsonErrResponse, jsonSuccessResponse}
+import helpers.JsonHelper.{jsonErrResponse, jsonSuccessResponse, getUserJsonFromRequest}
 import javax.inject._
+import models.{Regular, User}
 import play.api.Logger
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc._
 import services.UserService
 
@@ -18,29 +19,30 @@ import scala.concurrent.Future
 @Singleton
 class UserController @Inject()(authorizationAction: AuthorizationAction, cc: ControllerComponents, service: UserService) extends AbstractController(cc) {
 
-  val logger: Logger = Logger(this.getClass())
+  val logger: Logger = Logger(this.getClass)
 
-  def index() = authorizationAction.async({ request: Request[AnyContent] =>
-    service.index(request.session.get("connected").get).map(jsResponse => jsResponse.keys.contains("success") match {
-      case true => Ok(jsResponse)
-      case false => BadRequest(jsResponse)
-    })
-  })
-
+  def index() = authorizationAction { request: Request[AnyContent] =>
+    val jsValueUser: JsValue = Json.parse(request.session.get("user").get)
+    logger.debug("Index page")
+    Ok(jsValueUser)
+  }
 
   def login() = Action(parse.json).async { request: Request[JsValue] =>
     request.session
-      .get("connected")
-      .map { name =>
-        logger.info(s"Already logged in user: '$name'")
-        Future(Ok(jsonErrResponse("Already logged in") ++ Json.obj("user" -> Json.toJson(name))))
+      .get("user")
+      .map { user =>
+        logger.debug(s"Already logged in user: '$user'")
+        Future(Ok(jsonErrResponse("Already logged in") ++ Json.obj("user" -> Json.parse(user))))
       }
       .getOrElse {
-        service.login(request.body).map(jsResponse => jsResponse.keys.contains("success") match {
+        val userJson: JsObject = getUserJsonFromRequest(request.body.as[JsObject])
+        val userObj = Json.fromJson[User](userJson).getOrElse(User(0, "", "", ",", "", "", Regular))
+        service.login(userObj).map(jsResponse => jsResponse.keys.contains("success") match {
           case true => {
-            val connected = (jsResponse \ "user" \ "name").get.toString.replaceAll("\"", "")
-            val userType = (jsResponse \ "user" \ "typeOfUser").get.toString.replaceAll("\"", "")
-            Ok(jsResponse).withSession(request.session + ("connected" -> connected) + ("usertype" -> userType))
+            val loggedUser = (jsResponse \ "user").get
+            val name = (loggedUser \ "name").get.toString.replaceAll("\"", "")
+            val userType = (loggedUser \ "typeOfUser").get.toString.replaceAll("\"", "")
+            Ok(jsResponse).withSession(request.session + ("name" -> name) + ("usertype" -> userType) + ("user" -> Json.prettyPrint(loggedUser)))
           }
           case false => BadRequest(jsResponse)
         })
@@ -48,8 +50,7 @@ class UserController @Inject()(authorizationAction: AuthorizationAction, cc: Con
   }
 
   def logout() = authorizationAction { request =>
-    logger.info("Log out")
-    Ok(jsonSuccessResponse("logout") ++ Json.obj("user" -> Json.toJson(request.session.get("connected").get))).withSession(request.session - "connected" - "usertype")
+    logger.debug("Log out")
+    Ok(jsonSuccessResponse("logout") ++ Json.obj("user" -> Json.toJson(request.session.get("name").get))).withSession(request.session - "name" - "usertype" - "user")
   }
-
 }

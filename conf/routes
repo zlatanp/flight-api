@@ -10,22 +10,13 @@ GET     /                           controllers.HomeController.index
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 # Flight CRUD endpoints
-GET     /home                       controllers.UserController.index
-+ nocsrf
-POST    /user/login                 controllers.UserController.login
-+ nocsrf
-POST    /user/logout                controllers.UserController.logout
-+ nocsrf
-GET    /city/all                    controllers.CityController.all
-+ nocsrf
-GET    /city/one                    controllers.CityController.getCity
-+ nocsrf
-POST    /city/add                   controllers.CityController.add
-+ nocsrf
-POST    /city/comment               controllers.CityController.comment
-+ nocsrf
-DELETE    /city/deleteComment       controllers.CityController.delete
-+ nocsrf
-POST    /import                     controllers.AirportController.importAirport
-+ nocsrf
-GET    /flights                     controllers.AirportController.getFlights
+GET       /home                       controllers.UserController.index
+POST      /user/login                 controllers.UserController.login
+POST      /user/logout                controllers.UserController.logout
+GET       /city/all                   controllers.CityController.all
+GET       /city/one                   controllers.CityController.getCity
+POST      /city/add                   controllers.CityController.add
+POST      /city/comment               controllers.CityController.comment
+DELETE    /city/deleteComment         controllers.CityController.delete
+POST      /import                     controllers.AirportController.importAirport
+GET       /flights                    controllers.AirportController.getFlights
