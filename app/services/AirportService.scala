@@ -1,6 +1,6 @@
 package services
 
-import com.typesafe.config.ConfigFactory
+import play.api.Configuration
 import database.DataBase
 import helpers.JsonHelper.{jsonErrResponse, jsonSuccessResponse}
 import javax.inject.Inject
@@ -13,12 +13,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.Source
 
-class AirportService @Inject()(db: DataBase) {
+class AirportService @Inject()(config: Configuration, db: DataBase) {
 
   val logger: Logger = Logger(this.getClass())
 
-  val airportsPath = ConfigFactory.load().getString("data.airport")
-  val routesPath = ConfigFactory.load().getString("data.route")
+  val airportsPath = config.get[String]("data.airport")
+  val routesPath = config.get[String]("data.route")
 
   var allAirportsCache: MutableList[Airport] = new MutableList[Airport]()
   var allRoutesCache: MutableList[Route] = new MutableList[Route]()
