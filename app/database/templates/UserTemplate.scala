@@ -1,7 +1,6 @@
 package database.templates
 
-import models.UserType
-import models.UserType.{Admin, Regular}
+import models.{Admin, Regular, UserType}
 import slick.jdbc.H2Profile.api._
 
 case class UserTemplate(tag: Tag) extends Table[(Long, String, String, String, String, String, UserType)](tag, "USER") {

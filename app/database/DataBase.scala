@@ -2,7 +2,6 @@ package database
 
 import database.templates._
 import javax.inject.Singleton
-import models.UserType.{Admin, Regular}
 import models._
 import org.joda.time.DateTime
 import slick.jdbc.H2Profile.api._

@@ -28,21 +28,21 @@ class CityController @Inject()(authorizationAction: AuthorizationAction, cc: Con
   })
 
   def comment() = authorizationAction.async({ request: Request[AnyContent] =>
-    service.comment(request.session.get("connected").get, request.body.asJson).map(jsResponse => jsResponse.keys.contains("success") match {
+    service.comment(request.session.get("name").get, request.body.asJson).map(jsResponse => jsResponse.keys.contains("success") match {
       case true => Ok(jsResponse)
       case false => BadRequest(jsResponse)
     })
   })
 
   def delete() = authorizationAction.async({ request: Request[AnyContent] =>
-    service.delete(request.session.get("connected").get, request.body.asJson).map(jsResponse => jsResponse.keys.contains("success") match {
+    service.delete(request.session.get("name").get, request.body.asJson).map(jsResponse => jsResponse.keys.contains("success") match {
       case true => Ok(jsResponse)
       case false => BadRequest(jsResponse)
     })
   })
 
   def getCity() = authorizationAction.async({ request: Request[AnyContent] =>
-    service.getCity(request.session.get("connected").get, request.body.asJson).map(jsResponse => jsResponse.keys.contains("success") match {
+    service.getCity(request.session.get("name").get, request.body.asJson).map(jsResponse => jsResponse.keys.contains("success") match {
       case true => Ok(jsResponse)
       case false => BadRequest(jsResponse)
     })
