@@ -24,6 +24,5 @@ class HomeController @Inject()(cc: ControllerComponents, db: DataBase) extends A
    */
   def index() = Action.async({ implicit request: Request[AnyContent] =>
     Future(Ok(views.html.index()))
-
   })
 }

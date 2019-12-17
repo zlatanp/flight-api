@@ -15,10 +15,8 @@ class UserService @Inject()(db: DataBase) {
 
   val logger: Logger = Logger(this.getClass())
 
-  def index(user: Option[String], usertype: Option[String]): Future[JsObject] = {
-    (user, usertype) match {
-      case (Some(u), Some(t)) => {
-        db.findUserByName(u).map({
+  def index(user: String): Future[JsObject] = {
+        db.findUserByName(user).map({
           case Some(userExist) => {
             userExist match {
               case (id, firstName, lastName, name, password, salt, typeOfUser) => {
@@ -26,7 +24,7 @@ class UserService @Inject()(db: DataBase) {
                   case Admin => User(id, firstName, lastName, name, password, salt, Admin)
                   case Regular => User(id, firstName, lastName, name, password, salt, Regular)
                 }
-                logger.info(s"Logged in user: '$u'")
+                logger.info(s"Logged in user: '$user'")
                 Json.obj("user" -> Json.toJson(loggedInUser))
               }
               case _ => {
@@ -40,22 +38,11 @@ class UserService @Inject()(db: DataBase) {
             jsonErrResponse("Oops, you are not connected")
           }
         })
-      }
-      case (_, _) => {
-        logger.warn("Not connected user trying to open index page.")
-        Future(jsonErrResponse("Oops, you are not connected"))
-      }
-    }
   }
 
-  def login(json: Option[JsValue]): Future[JsObject] = {
-    if (json.isEmpty) {
-      logger.error("Empty Json data.")
-      Future(jsonErrResponse("Expecting Json data"))
-    } else {
-      val name = (json.get \ "name").asOpt[String]
-      val password = (json.get \ "password").asOpt[String]
-
+  def login(json: JsValue): Future[JsObject] = {
+      val name = (json \ "name").asOpt[String]
+      val password = (json \ "password").asOpt[String]
       (name, password) match {
         case (None, None) => {
           logger.warn("Missing parameter [name] and [password]")
@@ -94,7 +81,6 @@ class UserService @Inject()(db: DataBase) {
           })
         }
       }
-    }
   }
 
 }
